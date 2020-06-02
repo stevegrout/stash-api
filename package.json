@@ -1,0 +1,23 @@
+{
+  "name": "stash-api",
+  "version": "1.0.0",
+  "description": "API for Stash task",
+  "main": "index.js",
+  "repository": "git@github.com:stevegrout/stash-api.git",
+  "author": "Steve Grout <stevegroutdemo@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "setup": "docker-compose up -d --remove-orphans",
+    "start": "node services/index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-json-validator-middleware": "^2.1.1",
+    "jest": "^26.0.1",
+    "pg": "^8.2.1"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5"
+  }
+}
