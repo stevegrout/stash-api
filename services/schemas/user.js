@@ -15,7 +15,6 @@ exports.storeUserSchema = {
 
 exports.patchUserSchema = {
   type: 'object',
-  required: ['username', 'age'],
   properties: {
     username: {
       type: 'string',
@@ -25,5 +24,15 @@ exports.patchUserSchema = {
     age: {
       type: 'integer'
     }
+  }
+};
+
+exports.idCheck = {
+  type: 'object',
+  required: ['id'],
+  properties: {
+    id: {
+      type: 'string',
+    },
   }
 };

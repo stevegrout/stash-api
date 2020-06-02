@@ -1,4 +1,4 @@
-const { transactions } = require('../queries');
+const { transactions } = require('../db/sql');
 
 getAllTransactionsHandler = async (req, res) => {
   const { rows } = await req.pool.query(transactions.getAll);

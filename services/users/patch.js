@@ -1,4 +1,4 @@
-const { users } = require('../queries');
+const { users } = require('../db/sql');
 
 patchUserHandler = async (req, res) => {
   const id = parseInt(req.params.id);

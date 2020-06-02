@@ -1,4 +1,4 @@
-const { users } = require('../queries');
+const { users } = require('../db/sql');
 
 storeUserHandler = async (req, res) => {
   const { username, age } = req.body;

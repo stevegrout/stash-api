@@ -1,4 +1,4 @@
-const { users } = require('../queries');
+const { users } = require('../db/sql');
 
 getAllUsersHandler = async (req, res) => {
   const { rows } = await req.pool.query(users.getAllUsers);

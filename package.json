@@ -9,7 +9,8 @@
   "private": true,
   "scripts": {
     "setup": "docker-compose up -d --remove-orphans",
-    "start": "node services/index.js"
+    "start": "node services/index.js",
+    "test": "jest"
   },
   "dependencies": {
     "express": "^4.17.1",
