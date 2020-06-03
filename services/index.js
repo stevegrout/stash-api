@@ -54,7 +54,12 @@ app.use(function (err, req, res, next) {
       .status(400)
       .json({ msg: 'validation error', error: err.validationErrors.body });
     next();
-  } else next(err);
+  } else {
+    res
+      .status(400)
+      .json({msg: 'error', error: err.message});
+    next();
+  }
 });
 
 app.listen(3000);

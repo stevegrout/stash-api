@@ -16,11 +16,13 @@ const updateTransaction = (pool, id, amount, description) => {
 
 const getTransaction = async (pool, id) => {
   const { rows } = await pool.query(transactions.get, [id]);
+  if (!rows || rows.length < 1) throw new Error('Transaction not found');
   return rows[0];
 };
 
 const getUserBalance = async (pool, userId) => {
   const { rows } = await pool.query(users.getUser, [userId]);
+  if (!rows || rows.length < 1) throw new Error('User not found');
   return rows[0].balance;
 };
 
