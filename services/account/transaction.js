@@ -2,9 +2,9 @@ const {
   getTransaction,
   storeTransaction,
   updateTransaction,
-  updateUserBalance,
+  updateUserBalances,
   deleteTransaction,
-  getUserBalance,
+  getUser,
   getMonthlyAverages,
 } = require('../db/queries');
 
@@ -15,22 +15,22 @@ storeTransactionHandler = async (req, res, next) => {
   const userId = parseInt(req.params.id);
   const { amount, description, type } = req.body;
 
-  let existingBalance;
+  let user;
   try {
-    existingBalance = await getUserBalance(pool, userId);
+    user = await getUser(pool, userId);
   } catch (err) {
     next(err);
   }
-  const newAmount =
-    type === 'credit' ? existingBalance + amount : existingBalance - amount;
+
+  const newAmount = type === 'credit' ? user.balance + amount : user.balance - amount;
   const newBalance = Number.parseFloat(newAmount.toFixed(2));
 
-  const saving = await getNewSavingsAmount(pool, userId, newAmount);
+  const saving = await getNewSavingsAmount(pool, userId, newAmount, user.age);
 
   await executeTransaction(pool, [
     (client) =>
       storeTransaction(client, userId, amount, type, description, new Date()),
-    (client) => updateUserBalance(client, userId, newBalance, saving),
+    (client) => updateUserBalances(client, userId, newBalance, saving),
   ]);
 
   res.status(201).json({
@@ -39,24 +39,28 @@ storeTransactionHandler = async (req, res, next) => {
   });
 };
 
-updateTransactionHandler = async (req, res) => {
+updateTransactionHandler = async (req, res, next) => {
   const { pool } = req;
   const id = parseInt(req.params.id);
   const { amount, description, type } = req.body;
 
-  const existingTransaction = await getTransaction(pool, id);
+  let existingTransaction;
+  try {
+    existingTransaction = await getTransaction(pool, id);
+  } catch (err) {
+    next(err);
+  }
   const userId = existingTransaction.user_id;
-  const existingBalance = await getUserBalance(pool, userId);
+  const user = await getUser(pool, userId);
 
-  const newBalance = Number.parseFloat(
-    getBalanceOnUpdate(existingTransaction, req.body, existingBalance).toFixed(
-      2
-    )
-  );
+  const newAmount = getBalanceOnUpdate(existingTransaction, req.body, user.balance);
+  const newBalance = Number.parseFloat(newAmount.toFixed(2));
+
+  const saving = await getNewSavingsAmount(pool, userId, newAmount, user.age);
 
   await executeTransaction(pool, [
     (client) => updateTransaction(client, id, amount, description, type),
-    (client) => updateUserBalance(client, userId, newBalance),
+    (client) => updateUserBalances(client, userId, newBalance, saving),
   ]);
 
   res
@@ -78,13 +82,19 @@ const getBalanceOnUpdate = (
     : revertedBalance - newTransaction.amount;
 };
 
-deleteTransactionHandler = async (req, res) => {
+deleteTransactionHandler = async (req, res, next) => {
   const { pool } = req;
   const id = parseInt(req.params.id);
 
-  const transaction = await getTransaction(pool, id);
+  let transaction;
+  try {
+    transaction = await getTransaction(pool, id);
+  } catch (err) {
+    next(err);
+  }
   const userId = transaction.user_id;
-  const existingBalance = await getUserBalance(pool, userId);
+  const user = await getUser(pool, userId);
+  const existingBalance = user.balance;
 
   const newAmount =
     transaction.type === 'credit'
@@ -92,10 +102,11 @@ deleteTransactionHandler = async (req, res) => {
       : existingBalance + transaction.amount;
 
   const newBalance = Number.parseFloat(newAmount.toFixed(2));
+  const saving = await getNewSavingsAmount(pool, userId, newAmount, user.age);
 
   await executeTransaction(pool, [
     (client) => deleteTransaction(client, id),
-    (client) => updateUserBalance(client, userId, newBalance),
+    (client) => updateUserBalances(client, userId, newBalance, saving),
   ]);
 
   res
@@ -103,22 +114,23 @@ deleteTransactionHandler = async (req, res) => {
     .json({ msg: `deleted transaction ID: ${id}`, balance: newBalance });
 };
 
-const getNewSavingsAmount = async (pool, id, balance) => {
+const getNewSavingsAmount = async (pool, id, balance, age) => {
   const { rows } = await getMonthlyAverages(pool, id);
-  const monthlyCredit = rows.find((average) => average.type === 'credit');
-  const monthlyDebit = rows.find((average) => average.type === 'debit');
-  const aveMonthlyDiff = monthlyCredit.avg - monthlyDebit.avg;
+  const monthlyCredit = rows.find((average) => average.type === 'credit') || { avg: 0};
+  const monthlyDebit = rows.find((average) => average.type === 'debit') || { avg: 0};
+  const aveMonthlyDiff = monthlyDebit.avg + monthlyCredit.avg;
 
   let newSavingAmount = 0;
-  if (aveMonthlyDiff > 0) {
-    newSavingAmount = (balance - (aveMonthlyDiff)) / 2;
+  if (aveMonthlyDiff > 0 && balance > 100) {
+    newSavingAmount = (aveMonthlyDiff / 100) * (100 - age);  //Due to time - assuming max age is 100
   }
 
-  return Number.parseFloat((newSavingAmount).toFixed(2));
+  return Number.parseFloat(newSavingAmount.toFixed(2));
 };
 
 module.exports = {
   storeTransactionHandler,
   updateTransactionHandler,
   deleteTransactionHandler,
+  getNewSavingsAmount,
 };

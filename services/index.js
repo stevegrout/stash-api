@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./swagger.json');
 
 const {
   Validator,
@@ -10,7 +12,7 @@ const { getUserHandler, getAllUsersHandler } = require('./users/get');
 const storeUserHandler = require('./users/store');
 const updateUserHandler = require('./users/update');
 
-const { getAllTransactionsHandler, getTransactionHandler } = require('./account/get');
+const { getAllTransactionsHandler, getUserTransactionsHandler, getTransactionHandler } = require('./account/get');
 const { storeTransactionHandler, updateTransactionHandler, deleteTransactionHandler }  = require('./account/transaction');
 
 const app = express();
@@ -36,14 +38,17 @@ app.use(
 );
 app.use(dbPool);
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.get('/users', getAllUsersHandler);
 app.get('/users/:id', validate({ params: idCheck }), getUserHandler);
 app.post('/users', validate({ body: storeUserSchema }), storeUserHandler);
 app.put('/users/:id', validate({ body: updateUserSchema, params: idCheck }), updateUserHandler);
 
-app.get('/account/:id', getAllTransactionsHandler);
+app.get('/account/:id', getUserTransactionsHandler);
 app.post('/account/:id/transaction', validate({ body: storeTransactionSchema }), storeTransactionHandler);
 
+app.get('/transaction', getAllTransactionsHandler);
 app.put('/transaction/:id', validate({ body: updateTransactionSchema }), updateTransactionHandler);
 app.delete('/transaction/:id', deleteTransactionHandler);
 app.get('/transaction/:id', getTransactionHandler);

@@ -16,7 +16,8 @@
     "express": "^4.17.1",
     "express-json-validator-middleware": "^2.1.1",
     "jest": "^26.0.1",
-    "pg": "^8.2.1"
+    "pg": "^8.2.1",
+    "swagger-ui-express": "^4.1.4"
   },
   "devDependencies": {
     "prettier": "^2.0.5"

@@ -21,6 +21,7 @@ describe('Account Service [transaction]', () => {
 
     const mockDbPool = jest.fn();
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
+    mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [] }));
 
     const mockDbClient = jest.fn();
     mockDbClient.mockReturnValueOnce(Promise.resolve({ rows: [credit] }));
@@ -37,7 +38,7 @@ describe('Account Service [transaction]', () => {
 
     expect(res.status).toHaveBeenCalledWith(201);
     expect(res.json).toHaveBeenCalledWith({
-      msg: 'credit added',
+      msg: 'credit transaction saved',
       balance: 25.5,
     });
   });
@@ -73,6 +74,7 @@ describe('Account Service [transaction]', () => {
 
     const mockDbPool = jest.fn();
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
+    mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [] }));
 
     const mockDbClient = jest.fn();
     mockDbClient.mockReturnValueOnce(Promise.resolve());
@@ -87,7 +89,7 @@ describe('Account Service [transaction]', () => {
 
     await storeTransactionHandler(req, res);
 
-    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalance, [45.98, 1]);
+    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalances, [45.98, 0, 1]);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ balance: 45.98 })
     );
@@ -103,6 +105,7 @@ describe('Account Service [transaction]', () => {
     const mockDbPool = jest.fn();
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [existingCredit] }));
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
+    mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [] }));
 
     const mockDbClient = jest.fn();
     mockDbClient.mockReturnValue(Promise.resolve());
@@ -116,7 +119,7 @@ describe('Account Service [transaction]', () => {
 
     await updateTransactionHandler(req, res);
 
-    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalance, [35.52, 1]);
+    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalances, [35.52, 0, 1]);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ balance: 35.52 })
     );
@@ -131,6 +134,7 @@ describe('Account Service [transaction]', () => {
     const mockDbPool = jest.fn();
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [existingCredit] }));
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
+    mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [] }));
 
     const mockDbClient = jest.fn();
     mockDbClient.mockReturnValue(Promise.resolve());
@@ -144,7 +148,7 @@ describe('Account Service [transaction]', () => {
 
     await deleteTransactionHandler(req, res);
 
-    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalance, [10.0, 1]);
+    expect(mockDbClient).toHaveBeenNthCalledWith(3, users.updateUserBalances, [10.0, 0, 1]);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({ balance: 10.0 })
     );

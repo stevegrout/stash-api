@@ -20,14 +20,14 @@ const getTransaction = async (pool, id) => {
   return rows[0];
 };
 
-const getUserBalance = async (pool, userId) => {
+const getUser = async (pool, userId) => {
   const { rows } = await pool.query(users.getUser, [userId]);
   if (!rows || rows.length < 1) throw new Error('User not found');
-  return rows[0].balance;
+  return rows[0];
 };
 
-const updateUserBalance = (pool, userId, newBalance, saving) => {
-  return pool.query(users.updateUserBalance, [newBalance, saving, userId]);
+const updateUserBalances = (pool, userId, newBalance, saving) => {
+  return pool.query(users.updateUserBalances, [newBalance, saving, userId]);
 };
 
 const deleteTransaction = (pool, id) => {
@@ -46,8 +46,8 @@ module.exports = {
   getTransaction,
   storeTransaction,
   updateTransaction,
-  getUserBalance,
-  updateUserBalance,
+  getUser,
+  updateUserBalances,
   deleteTransaction,
   deleteUser,
   getMonthlyAverages,

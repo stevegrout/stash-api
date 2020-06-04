@@ -5,6 +5,12 @@ getAllTransactionsHandler = async (req, res) => {
   res.status(200).json(rows);
 };
 
+getUserTransactionsHandler = async (req, res) => {
+  const userId = parseInt(req.params.id);
+  const { rows } = await req.pool.query(transactions.getAllForUser, [userId]);
+  res.status(200).json(rows);
+};
+
 getTransactionHandler = async (req, res) => {
   const id = parseInt(req.params.id);
   const { rows } = await req.pool.query(transactions.get, [id]);
@@ -15,5 +21,6 @@ getTransactionHandler = async (req, res) => {
 
 module.exports = {
   getTransactionHandler,
-  getAllTransactionsHandler
+  getAllTransactionsHandler,
+  getUserTransactionsHandler,
 };
