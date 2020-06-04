@@ -7,13 +7,13 @@ const mockResponse = () => {
   return res;
 };
 
-const res = mockResponse();
-const mockDbPool = jest.fn();
-
 describe('Users Service [store]', () => {
   test('saves a user', async () => {
     const user = { username: 'test', age: 18 };
     const req = { body: user };
+    const res = mockResponse();
+    const mockDbPool = jest.fn();
+
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
     req.pool = { query: mockDbPool };
 

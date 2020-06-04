@@ -1,6 +1,6 @@
 const { users } = require('../db/sql');
 
-patchUserHandler = async (req, res) => {
+updateUserHandler = async (req, res) => {
   const id = parseInt(req.params.id);
   const { username, age } = req.body;
 
@@ -10,4 +10,4 @@ patchUserHandler = async (req, res) => {
     .send({ message: `User modified with ID: ${id}`});
 };
 
-module.exports = patchUserHandler;
+module.exports = updateUserHandler;

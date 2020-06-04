@@ -8,19 +8,18 @@ const {
 
 const { getUserHandler, getAllUsersHandler } = require('./users/get');
 const storeUserHandler = require('./users/store');
-const patchUserHandler = require('./users/patch');
+const updateUserHandler = require('./users/update');
 
-const getAllTransactionsHandler = require('./account/get');
-const { storeCreditHandler, patchCreditHandler, deleteCreditHandler }  = require('./account/credit');
-const storeDebitHandler = require('./account/debit');
+const { getAllTransactionsHandler, getTransactionHandler } = require('./account/get');
+const { storeTransactionHandler, updateTransactionHandler, deleteTransactionHandler }  = require('./account/transaction');
 
 const app = express();
 
 const validator = new Validator({ allErrors: true });
 const validate = validator.validate;
 
-const { storeUserSchema, patchUserSchema, idCheck } = require('./schemas/user');
-const { storeTransactionSchema, patchTransactionSchema } = require('./schemas/account');
+const { storeUserSchema, updateUserSchema, idCheck } = require('./schemas/user');
+const { storeTransactionSchema, updateTransactionSchema } = require('./schemas/account');
 
 const { pool } = require('./db/connect');
 
@@ -40,13 +39,14 @@ app.use(dbPool);
 app.get('/users', getAllUsersHandler);
 app.get('/users/:id', validate({ params: idCheck }), getUserHandler);
 app.post('/users', validate({ body: storeUserSchema }), storeUserHandler);
-app.patch('/users/:id', validate({ body: patchUserSchema, params: idCheck }), patchUserHandler);
+app.put('/users/:id', validate({ body: updateUserSchema, params: idCheck }), updateUserHandler);
 
 app.get('/account/:id', getAllTransactionsHandler);
-app.post('/account/:id/credit', validate({ body: storeTransactionSchema }), storeCreditHandler);
-app.post('/account/:id/debit', validate({ body: storeTransactionSchema }), storeDebitHandler);
-app.patch('/account/credit/:id', validate({ body: patchTransactionSchema }), patchCreditHandler);
-app.delete('/account/credit/:id', deleteCreditHandler);
+app.post('/account/:id/transaction', validate({ body: storeTransactionSchema }), storeTransactionHandler);
+
+app.put('/transaction/:id', validate({ body: updateTransactionSchema }), updateTransactionHandler);
+app.delete('/transaction/:id', deleteTransactionHandler);
+app.get('/transaction/:id', getTransactionHandler);
 
 app.use(function (err, req, res, next) {
   if (err instanceof ValidationError) {

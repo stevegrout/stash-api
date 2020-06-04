@@ -1,6 +1,6 @@
 exports.storeTransactionSchema = {
   type: 'object',
-  required: ['amount', 'description'],
+  required: ['amount', 'description', 'type'],
   properties: {
     description: {
       type: 'string',
@@ -8,12 +8,17 @@ exports.storeTransactionSchema = {
       maxLength: 200
     },
     amount: {
-      type: 'number'
+      type: 'number',
+      minimum: 0
+    },
+    type: {
+      type: 'string',
+      enum: ['credit', 'debit']
     }
   }
 };
 
-exports.patchTransactionSchema = {
+exports.updateTransactionSchema = {
   type: 'object',
   properties: {
     description: {
@@ -22,7 +27,12 @@ exports.patchTransactionSchema = {
       maxLength: 200
     },
     amount: {
-      type: 'number'
+      type: 'number',
+      minimum: 0
+    },
+    type: {
+      type: 'string',
+      enum: ['credit', 'debit']
     }
   }
 };

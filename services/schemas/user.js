@@ -13,7 +13,7 @@ exports.storeUserSchema = {
   }
 };
 
-exports.patchUserSchema = {
+exports.updateUserSchema = {
   type: 'object',
   properties: {
     username: {

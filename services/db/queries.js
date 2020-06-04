@@ -10,8 +10,8 @@ const storeTransaction = (pool, userId, amount, type, description) => {
   ]);
 };
 
-const updateTransaction = (pool, id, amount, description) => {
-  return pool.query(transactions.update, [amount, description, id]);
+const updateTransaction = (pool, id, amount, description, type) => {
+  return pool.query(transactions.update, [amount, description, type, id]);
 };
 
 const getTransaction = async (pool, id) => {
@@ -26,16 +26,20 @@ const getUserBalance = async (pool, userId) => {
   return rows[0].balance;
 };
 
-const updateUserBalance = async (pool, userId, newBalance) => {
-  return pool.query(users.updateUserBalance, [newBalance, userId]);
+const updateUserBalance = (pool, userId, newBalance, saving) => {
+  return pool.query(users.updateUserBalance, [newBalance, saving, userId]);
 };
 
-const deleteTransaction = async (pool, id) => {
+const deleteTransaction = (pool, id) => {
   return pool.query(transactions.delete, [id]);
 };
 
-const deleteUser = async (pool, id) => {
+const deleteUser = (pool, id) => {
   return pool.query(users.delete, [id]);
+};
+
+const getMonthlyAverages = (pool, id) => {
+  return pool.query(users.getMonthlyAverages, [id])
 };
 
 module.exports = {
@@ -46,4 +50,5 @@ module.exports = {
   updateUserBalance,
   deleteTransaction,
   deleteUser,
+  getMonthlyAverages,
 };

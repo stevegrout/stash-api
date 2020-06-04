@@ -1,4 +1,4 @@
-const { getUserHandler, getAllUsersHandler } = require('./get');
+const { getTransactionHandler, getAllTransactionsHandler } = require('./get');
 
 const mockResponse = () => {
   const res = {};
@@ -7,9 +7,9 @@ const mockResponse = () => {
   return res;
 };
 
-describe('Users Service [get]', () => {
-  test('returns a user if they exist', async () => {
-    const rows = [{ username: 'test' }];
+describe('Account Service [get]', () => {
+  test('returns a transaction if it exists', async () => {
+    const rows = [{ type: 'credit' }];
     const req = { params: { id: 1 } };
     const res = mockResponse();
     const mockDbPool = jest.fn();
@@ -17,12 +17,12 @@ describe('Users Service [get]', () => {
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows }));
     req.pool = { query: mockDbPool };
 
-    await getUserHandler(req, res);
+    await getTransactionHandler(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(rows);
   });
 
-  test('returns a not found error if a user does not exist', async () => {
+  test('returns a not found error if a transaction does not exist', async () => {
     const id = 1;
     const req = { params: { id } };
     const res = mockResponse();
@@ -31,20 +31,20 @@ describe('Users Service [get]', () => {
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [] }));
     req.pool = { query: mockDbPool };
 
-    await getUserHandler(req, res);
+    await getTransactionHandler(req, res);
     expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({ msg: `User not found with id: ${id}` });
+    expect(res.json).toHaveBeenCalledWith({ msg: `Transaction not found with id: ${id}` });
   });
 
-  test('returns a list of all users', async () => {
-    const rows = [{ username: 'test1' }, { username: 'test2' }];
+  test('returns a list of all transaction', async () => {
+    const rows = [{ type: 'credit' }, { type: 'debit' }];
     const res = mockResponse();
     const mockDbPool = jest.fn();
 
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows }));
     const req = { pool: { query: mockDbPool }};
 
-    await getAllUsersHandler(req, res);
+    await getAllTransactionsHandler(req, res);
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.json).toHaveBeenCalledWith(rows);
   });
