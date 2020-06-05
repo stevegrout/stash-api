@@ -5,9 +5,9 @@ const {
   updateUserBalances,
   deleteTransaction,
   getUser,
-  getMonthlyAverages,
 } = require('../db/queries');
 
+const { getNewSavingsAmount } = require('./util/monthlySavings');
 const { executeTransaction } = require('../db/transaction');
 
 storeTransactionHandler = async (req, res, next) => {
@@ -112,20 +112,6 @@ deleteTransactionHandler = async (req, res, next) => {
   res
     .status(200)
     .json({ msg: `deleted transaction ID: ${id}`, balance: newBalance });
-};
-
-const getNewSavingsAmount = async (pool, id, balance, age) => {
-  const { rows } = await getMonthlyAverages(pool, id);
-  const monthlyCredit = rows.find((average) => average.type === 'credit') || { avg: 0};
-  const monthlyDebit = rows.find((average) => average.type === 'debit') || { avg: 0};
-  const aveMonthlyDiff = monthlyDebit.avg + monthlyCredit.avg;
-
-  let newSavingAmount = 0;
-  if (aveMonthlyDiff > 0 && balance > 100) {
-    newSavingAmount = (aveMonthlyDiff / 100) * (100 - age);  //Due to time - assuming max age is 100
-  }
-
-  return Number.parseFloat(newSavingAmount.toFixed(2));
 };
 
 module.exports = {

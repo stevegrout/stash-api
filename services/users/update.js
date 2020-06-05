@@ -7,7 +7,7 @@ updateUserHandler = async (req, res) => {
   await req.pool.query(users.updateUser, [username, age, id]);
   res
     .status(200)
-    .send({ message: `User modified with ID: ${id}`});
+    .json({ msg: `User modified with ID: ${id}`});
 };
 
 module.exports = updateUserHandler;

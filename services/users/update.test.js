@@ -1,4 +1,4 @@
-const storeUserHandler = require('./store');
+const updateUserHandler = require('./update');
 const { users } = require('../db/sql');
 
 const mockResponse = () => {
@@ -10,18 +10,18 @@ const mockResponse = () => {
 
 describe('Users Service [store]', () => {
   test('saves a user', async () => {
+    const id = 1;
     const user = { username: 'test', age: 18 };
-    const req = { body: user };
+    const req = { params: { id }, body: user };
     const res = mockResponse();
     const mockDbPool = jest.fn();
 
     mockDbPool.mockReturnValueOnce(Promise.resolve({ rows: [user] }));
     req.pool = { query: mockDbPool };
 
-    await storeUserHandler(req, res);
-
-    expect(mockDbPool).toHaveBeenCalledWith(users.storeUser, ['test', 18]);
-    expect(res.status).toHaveBeenCalledWith(201);
-    expect(res.json).toHaveBeenCalledWith({ msg: 'user created', user });
+    await updateUserHandler(req, res);
+    expect(mockDbPool).toHaveBeenCalledWith(users.updateUser, ['test', 18, id]);
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({msg: `User modified with ID: ${id}`});
   });
 });
