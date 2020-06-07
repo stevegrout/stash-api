@@ -2,6 +2,7 @@
   "name": "stash-api",
   "version": "1.0.0",
   "description": "API for Stash task",
+  "engines" : { "node" : ">=0.12" },
   "main": "index.js",
   "repository": "git@github.com:stevegrout/stash-api.git",
   "author": "Steve Grout <stevegroutdemo@gmail.com>",

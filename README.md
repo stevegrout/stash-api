@@ -2,6 +2,8 @@
 
 ### To run the API:
 
+Needs docker installed.
+
 - yarn run setup
 - yarn install
 - yarn start
