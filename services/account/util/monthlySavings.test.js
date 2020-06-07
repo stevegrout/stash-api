@@ -37,11 +37,17 @@ describe('monthlySavings', () => {
 
   test("returns a 0 savings figure for people who's average monthly outgoings are higher than their" +
     " average monthly incoming", async () => {
+
+    const newgativeMonthlyAverages = [
+      { type: 'credit', avg: 120.55 },
+      { type: 'debit', avg: 150.55 },
+    ];
+
     const balance = 200;
     const age = 40;
 
     const mockDbQuery = jest.fn();
-    mockDbQuery.mockReturnValue(Promise.resolve({ rows: monthlyAverages }));
+    mockDbQuery.mockReturnValue(Promise.resolve({ rows: newgativeMonthlyAverages }));
     const pool = { query: mockDbQuery };
 
     const newSavingsAmount = await getNewSavingsAmount(pool, 1, balance, age);
